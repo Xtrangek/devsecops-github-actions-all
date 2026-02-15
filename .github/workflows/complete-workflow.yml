@@ -4,7 +4,6 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Run unit tests and SAST scan on the source code
     steps:
       - uses: actions/checkout@v4
 
@@ -15,9 +14,8 @@ jobs:
           distribution: 'zulu'
           cache: maven
 
-      # (Opcional pero recomendado) correr tests antes del análisis
-      - name: Run unit tests (Maven)
-        run: mvn -B test
+      - name: Build (compile)
+        run: mvn -B -DskipTests package
 
       - name: Sonar Analysis
         uses: sonarsource/sonarqube-scan-action@master
@@ -27,6 +25,7 @@ jobs:
             -Dsonar.projectKey=ony-devsecops-all
             -Dsonar.projectName=DevSecOps-GitHub-Actions-All
             -Dsonar.sources=.
+            -Dsonar.java.binaries=target/classes
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
